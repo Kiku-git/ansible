@@ -74,6 +74,8 @@ class ActionModule(ActionBase):
                     skipped[fact_module] = res.get('msg')
                 else:
                     result = combine_vars(result, {'ansible_facts': res.get('ansible_facts', {})})
+
+            self._remove_tmp_path(self._connection._shell.tmpdir)
         else:
             # do it async
             jobs = {}
@@ -116,5 +118,8 @@ class ActionModule(ActionBase):
 
         # tell executor facts were gathered
         result['ansible_facts']['_ansible_facts_gathered'] = True
+
+        # hack to keep --verbose from showing all the setup module result
+        result['_ansible_verbose_override'] = True
 
         return result
